@@ -138,23 +138,23 @@ void RunExampleTableScan() {
 	con.Query("COMMIT");
 
 	// standard projections
-	ExecuteQuery(con, "SELECT * FROM mytable");
-	ExecuteQuery(con, "SELECT i FROM mytable");
-	ExecuteQuery(con, "SELECT j FROM mytable");
-	ExecuteQuery(con, "SELECT k FROM myothertable");
-	// some simple filter + projection
-	ExecuteQuery(con, "SELECT i+1 FROM mytable WHERE i=3 OR i=4");
+	// ExecuteQuery(con, "SELECT * FROM mytable");
+	// ExecuteQuery(con, "SELECT i FROM mytable");
+	// ExecuteQuery(con, "SELECT j FROM mytable");
+	// ExecuteQuery(con, "SELECT k FROM myothertable");
+	// // some simple filter + projection
+	// ExecuteQuery(con, "SELECT i+1 FROM mytable WHERE i=3 OR i=4");
 	// more complex filters
-	ExecuteQuery(con, "SELECT i+1 FROM mytable WHERE (i<=2 AND j<=3) OR (i=4 AND j=5)");
-	// aggregate
-	ExecuteQuery(con, "SELECT COUNT(*), SUM(i) + 1, SUM(j) + 2 FROM mytable WHERE i>2");
+	// ExecuteQuery(con, "SELECT i+1 FROM mytable WHERE (i<=2 AND j<=3) OR (i=4 AND j=5)");
+	// // aggregate
+	// ExecuteQuery(con, "SELECT COUNT(*), SUM(i) + 1, SUM(j) + 2 FROM mytable WHERE i>2");
 	// with a subquery
 	ExecuteQuery(con,
 	             "SELECT a, b + 1, c + 2 FROM (SELECT COUNT(*), SUM(i), SUM(j) FROM mytable WHERE i > 2) tbl(a, b, c)");
 }
 
 int main() {
-	RunExampleDuckDBCatalog();
+	// RunExampleDuckDBCatalog();
 	RunExampleTableScan();
 }
 
