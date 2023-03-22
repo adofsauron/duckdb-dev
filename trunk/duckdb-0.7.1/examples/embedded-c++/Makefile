@@ -2,7 +2,7 @@
 
 .PHONY: duckdb clean main
 
-all: duckdb main
+all: main
 
 clean:
 	rm -rf build
@@ -12,7 +12,7 @@ duckdb:
 
 main:
 	mkdir -p build
-	cd build && cmake .. -DCMAKE_BUILD_TYPE=Debug && make
+	cd build && cmake .. -DCMAKE_BUILD_TYPE=Debug && cmake --build .
 	build/example
 
 
