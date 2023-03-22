@@ -2,13 +2,13 @@
 
 .PHONY: duckdb clean main
 
-all: duckdb main
+all: main
 
 clean:
 	rm -rf build
 
 duckdb:
-	cd ../.. && make
+	cd ../.. && make debug -j`nproc`
 
 main:
 	mkdir -p build
