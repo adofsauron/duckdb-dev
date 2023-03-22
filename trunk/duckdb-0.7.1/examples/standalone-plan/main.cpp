@@ -21,6 +21,8 @@
 #include "duckdb/parser/expression/constant_expression.hpp"
 #include "duckdb/parser/expression/function_expression.hpp"
 #include "duckdb/storage/statistics/numeric_statistics.hpp"
+#include "duckdb/main/config.hpp"
+#include "duckdb/catalog/catalog_entry/duck_table_entry.hpp"
 #endif
 
 using namespace duckdb;
@@ -41,15 +43,15 @@ void RunExampleDuckDBCatalog() {
 	// we can use our own table functions (see RunExampleTableScan), but this is slightly more involved
 
 	DBConfig config;
-	config.initialize_default_database = false;
+	config.options.initialize_default_database = false;
 
 	// disable the statistics propagator optimizer
 	// this is required since the statistics propagator will truncate our plan
 	// (e.g. it will recognize the table is empty that satisfy the predicate i=3
 	//       and then prune the entire plan)
-	config.disabled_optimizers.insert(OptimizerType::STATISTICS_PROPAGATION);
+	config.options.disabled_optimizers.insert(OptimizerType::STATISTICS_PROPAGATION);
 	// we don't support filter pushdown yet in our toy example
-	config.disabled_optimizers.insert(OptimizerType::FILTER_PUSHDOWN);
+	config.options.disabled_optimizers.insert(OptimizerType::FILTER_PUSHDOWN);
 
 	DuckDB db(nullptr, &config);
 	Connection con(db);
@@ -71,9 +73,10 @@ void RunExampleDuckDBCatalog() {
 	// (see MyScanNode)
 
 	// register functions and aggregates (for our binding purposes)
-	CreateFunction(con, "+", {LogicalType::INTEGER, LogicalType::INTEGER}, LogicalType::INTEGER);
-	CreateAggregateFunction(con, "count_star", {}, LogicalType::BIGINT);
-	CreateAggregateFunction(con, "sum", {LogicalType::INTEGER}, LogicalType::INTEGER);
+	// 
+	// CreateFunction(con, "+", {LogicalType::INTEGER, LogicalType::INTEGER}, LogicalType::INTEGER);
+	// CreateAggregateFunction(con, "count_star", {}, LogicalType::BIGINT);
+	// CreateAggregateFunction(con, "sum", {LogicalType::INTEGER}, LogicalType::INTEGER);
 
 	con.Query("COMMIT");
 
@@ -114,7 +117,7 @@ void RunExampleTableScan() {
 	// this means we don't need to disable optimizers anymore
 
 	DBConfig config;
-	config.initialize_default_database = false;
+	config.options.initialize_default_database = false;
 	config.replacement_scans.push_back(ReplacementScan(MyReplacementScan));
 
 	DuckDB db(nullptr, &config);
@@ -126,9 +129,9 @@ void RunExampleTableScan() {
 	con.Query("BEGIN TRANSACTION");
 
 	// register functions and aggregates (for our binding purposes)
-	CreateFunction(con, "+", {LogicalType::INTEGER, LogicalType::INTEGER}, LogicalType::INTEGER);
-	CreateAggregateFunction(con, "count_star", {}, LogicalType::BIGINT);
-	CreateAggregateFunction(con, "sum", {LogicalType::INTEGER}, LogicalType::INTEGER);
+	// CreateFunction(con, "+", {LogicalType::INTEGER, LogicalType::INTEGER}, LogicalType::INTEGER);
+	// CreateAggregateFunction(con, "count_star", {}, LogicalType::BIGINT);
+	// CreateAggregateFunction(con, "sum", {LogicalType::INTEGER}, LogicalType::INTEGER);
 
 	CreateMyScanFunction(con);
 
@@ -178,7 +181,7 @@ void CreateAggregateFunction(Connection &con, string name, vector<LogicalType> a
 	// we can register multiple functions here if we want overloads
 	AggregateFunctionSet set(name);
 	set.AddFunction(
-	    AggregateFunction(std::move(arguments), std::move(return_type), nullptr, nullptr, nullptr, nullptr, nullptr));
+	    AggregateFunction(std::move(arguments), std::move(return_type), nullptr, nullptr, nullptr, nullptr, nullptr, nullptr));
 
 	CreateAggregateFunctionInfo info(std::move(set));
 	catalog.CreateFunction(context, &info);
@@ -220,6 +223,7 @@ static unique_ptr<FunctionData> MyScanBind(ClientContext &context, TableFunction
 	return std::move(result);
 }
 
+#if 0
 static unique_ptr<BaseStatistics> MyScanStatistics(ClientContext &context, const FunctionData *bind_data_p,
                                                    column_t column_id) {
 	auto &bind_data = (MyBindData &)*bind_data_p;
@@ -237,6 +241,7 @@ static unique_ptr<BaseStatistics> MyScanStatistics(ClientContext &context, const
 	}
 	return nullptr;
 }
+#endif
 
 unique_ptr<NodeStatistics> MyScanCardinality(ClientContext &context, const FunctionData *bind_data_p) {
 	auto &bind_data = (MyBindData &)*bind_data_p;
@@ -253,8 +258,9 @@ void CreateMyScanFunction(Connection &con) {
 	auto &context = *con.context;
 	auto &catalog = Catalog::Catalog::GetSystemCatalog(context);
 
-	TableFunction my_scan("my_scan", {LogicalType::VARCHAR}, nullptr, MyScanBind, nullptr, MyScanStatistics, nullptr,
-	                      nullptr, MyScanCardinality);
+	// TableFunction my_scan("my_scan", {LogicalType::VARCHAR}, nullptr, MyScanBind, nullptr, MyScanStatistics, nullptr,
+	//                       nullptr, MyScanCardinality);
+	TableFunction my_scan("my_scan", {LogicalType::VARCHAR}, nullptr, MyScanBind);
 	my_scan.projection_pushdown = true;
 	my_scan.filter_pushdown = false;
 
