@@ -43,6 +43,7 @@ void RunExampleDuckDBCatalog() {
 	// we can use our own table functions (see RunExampleTableScan), but this is slightly more involved
 
 	DBConfig config;
+
 	config.options.initialize_default_database = false;
 
 	// disable the statistics propagator optimizer
