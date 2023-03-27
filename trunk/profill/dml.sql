@@ -30,7 +30,11 @@ insert into c values(null, 'c3');
 insert into d values(1, 'd1');
  
 insert into d values(2, 'd2');
+
+insert into d values(1, 'd3');
  
-insert into d values(null, 'd3');
+insert into d values(2, 'd4');
+ 
+insert into d values(null, 'd5');
 
 
