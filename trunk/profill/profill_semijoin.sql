@@ -1,7 +1,4 @@
 
--- json, query_tre, query_tree_optimizer
-PRAGMA enable_profiling='json';
-
 EXPLAIN ANALYZE 
 SELECT
 *
