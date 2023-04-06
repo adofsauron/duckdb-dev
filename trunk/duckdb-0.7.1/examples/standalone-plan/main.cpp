@@ -466,10 +466,13 @@ public:
 			return aggregate_states;
 		}
 		while (true) {
+			// sorce data
 			auto next = child->GetNextRow();
 			if (next.empty()) {
 				return std::move(aggregate_states);
 			}
+
+			// sink
 			MyExpressionExecutor executor(next);
 			for (size_t i = 0; i < aggregates.size(); i++) {
 				ExecuteAggregate(executor, i, (BoundAggregateExpression &)*aggregates[i]);

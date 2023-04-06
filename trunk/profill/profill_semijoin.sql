@@ -14,3 +14,12 @@ EXISTS (
     c.c1 = d.d1
 ) ;
 
+
+EXPLAIN ANALYZE
+SELECT
+	*
+FROM
+	c
+LEFT OUTER JOIN d ON
+	c.c1 = d.d1;
+
