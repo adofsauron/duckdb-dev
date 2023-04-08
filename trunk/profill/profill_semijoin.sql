@@ -21,5 +21,5 @@ SELECT
 FROM
 	c
 LEFT OUTER JOIN d ON
-	c.c1 = d.d1;
+	c.c1 = d.d1 ;
 
